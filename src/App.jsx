@@ -27,7 +27,7 @@ export default function App() {
 
   return (
     // The main container for the entire app
-    <div className="h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white font-sans flex flex-col transition-colors duration-300">
+    <div className="h-screen bg-orange-50 dark:bg-stone-900 text-stone-800 dark:text-stone-200 font-sans flex flex-col transition-colors duration-300">
       <Navbar activePage={activePage} setActivePage={setActivePage} />
 
       {/* Main content area */}

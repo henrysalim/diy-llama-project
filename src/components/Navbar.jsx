@@ -17,8 +17,8 @@ const Navbar = ({ activePage, setActivePage }) => {
       }}
       className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
         activePage === pageName
-          ? "bg-gray-900 text-white"
-          : "text-gray-500 hover:bg-gray-700 hover:text-white"
+          ? "bg-emerald-800 text-white"
+          : "text-stone-600 dark:text-stone-300 hover:bg-emerald-600 hover:text-white"
       }`}
     >
       {pageName}
@@ -26,7 +26,7 @@ const Navbar = ({ activePage, setActivePage }) => {
   );
 
   return (
-    <nav className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-md fixed w-full top-0 z-50">
+    <nav className="bg-white/80 dark:bg-stone-900/80 backdrop-blur-sm shadow-md fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left side: Logo */}
