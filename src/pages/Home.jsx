@@ -2,25 +2,27 @@ import { useEffect, useRef, useState } from "react";
 import ImageInputForm from "../components/ImageInputForm";
 
 const Home = () => {
-  const [imageFiles, setImageFiles] = useState([]);
-  const [imagePreviews, setImagePreviews] = useState([]);
+  const [imageFile, setImageFile] = useState("");
+  const [imagePreview, setImagePreview] = useState("");
   const fileInputRef = useRef(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiResponse, setApiResponse] = useState("");
 
   useEffect(() => {
     return () => {
-      imagePreviews.forEach((file) => URL.revokeObjectURL(file));
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
     };
-  }, [imagePreviews]);
+  }, [imagePreview]);
 
   const handleImageChange = (e) => {
-    if (e.target.files) {
-      const filesArray = Array.from(e.target.files);
-      const newPreviews = filesArray.map((file) => URL.createObjectURL(file));
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
 
-      setImageFiles((prevImages) => [...prevImages, ...filesArray]);
-      setImagePreviews((prevPreviews) => [...prevPreviews, ...newPreviews]);
+    if (e.target.files && e.target.files[0]) {
+      const fileImage = e.target.files[0];
+      const newPreview = URL.createObjectURL(fileImage);
+
+      setImageFile(fileImage);
+      setImagePreview(newPreview);
     }
   };
 
@@ -28,21 +30,13 @@ const Home = () => {
     fileInputRef.current.click();
   };
 
-  const handleRemoveImage = (indexToRemove) => {
-    setImagePreviews((prevPreviews) => {
-      URL.revokeObjectURL(prevPreviews[indexToRemove]);
-      return prevPreviews.filter((_, index) => index !== indexToRemove);
-    });
-
-    setImageFiles((prevFiles) => {
-      return prevFiles.filter((_, index) => index !== indexToRemove);
-    });
-  };
-
-  const clearAllImages = () => {
-    imagePreviews.forEach((file) => URL.revokeObjectURL(file));
-    setImageFiles([]);
-    setImagePreviews([]);
+  const handleRemoveImage = () => {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+      URL.revokeObjectURL(imageFile);
+    }
+    setImageFile("");
+    setImagePreview("");
 
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -57,18 +51,23 @@ const Home = () => {
       reader.onerror = (error) => reject(error);
     });
 
+  const clearImage = () => {
+    if (imagePreview && imageFile) {
+      setImageFile(URL.revokeObjectURL(imageFile));
+      setImagePreview(URL.revokeObjectURL(imagePreview));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (imageFiles.length === 0 && isSubmitting) return;
+    if (imageFile.length === 0 && isSubmitting) return;
 
     setIsSubmitting(true);
     setApiResponse("");
 
     try {
       // convert images to base64
-      const base64images = await Promise.all(
-        imageFiles.map((file) => fileToBase64(file))
-      );
+      const base64images = await fileToBase64(imageFile);
 
       const apiKey = import.meta.env.VITE_LLAMA_API_KEY;
 
@@ -78,26 +77,26 @@ const Home = () => {
           method: "POST",
           headers: {
             Authorization: `Bearer ${apiKey}`,
-            // "HTTP-Referer": "<YOUR_SITE_URL>", // Optional. Site URL for rankings on openrouter.ai.
-            // "X-Title": "<YOUR_SITE_NAME>", // Optional. Site title for rankings on openrouter.ai.
+            "HTTP-Referer": "https://diy-llama-project.vercel.app", // Optional. Site URL for rankings on openrouter.ai.
+            "X-Title": "DIY Llama Project", // Optional. Site title for rankings on openrouter.ai.
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "meta-llama/llama-4-maverick",
+            model: "meta-llama/llama-3.2-90b-vision-instruct",
             messages: [
               {
                 role: "user",
                 content: [
                   {
                     type: "text",
-                    text: prompt || "Apakah Anda bisa melihat gambar berikut?",
+                    text: "Apakah Anda bisa melihat gambar berikut? Coba jelaskan!",
                   },
-                  ...base64images.map((imageBase64) => ({
+                  {
                     type: "image_url",
                     image_url: {
-                      url: imageBase64,
+                      url: base64images,
                     },
-                  })),
+                  },
                 ],
               },
             ],
@@ -118,7 +117,7 @@ const Home = () => {
       console.error("Error calling OpenRouter API: ", error);
       setApiResponse(`Error: ${error.message}`);
     } finally {
-      clearAllImages();
+      clearImage();
       setIsSubmitting(false);
     }
   };
@@ -136,8 +135,8 @@ const Home = () => {
         </p>
       </div>
       <ImageInputForm
-        imageFiles={imageFiles}
-        imagePreviews={imagePreviews}
+        imageFiles={imageFile}
+        imagePreviews={imagePreview}
         fileInputRef={fileInputRef}
         handleRemoveImage={handleRemoveImage}
         handleSubmit={handleSubmit}
