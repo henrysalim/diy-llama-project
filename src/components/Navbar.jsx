@@ -8,12 +8,8 @@ const Navbar = ({ activePage, setActivePage }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navLinks = ["Home", "ChatFeiCraft", "About FeiCraft", "Creators"];
   const supabase = createClient(
-    process.env.NODE_ENV === "development"
-      ? import.meta.env.VITE_SUPABASE_URL
-      : process.env.VITE_PUBLIC_SUPABASE_URL,
-    process.env.NODE_ENV === "development"
-      ? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
-      : process.env.SUPABASE_ANON_KEY
+    import.meta.env.VITE_PUBLIC_SUPABASE_URL,
+    import.meta.env.VITE_PUBLIC_SUPABASE_ANON_KEY
   );
 
   const NavLink = ({ pageName }) => (
