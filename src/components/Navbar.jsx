@@ -50,7 +50,6 @@ const Navbar = ({ activePage, setActivePage }) => {
     }
 
     if (code) {
-      const supabase = await createClient();
       const { error } = await supabase.auth.exchangeCodeForSession(code);
 
       if (!error) {
