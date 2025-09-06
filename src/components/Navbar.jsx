@@ -33,6 +33,9 @@ const Navbar = ({ activePage, setActivePage }) => {
   const handleSignInGoogle = async () => {
     return supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        redirectTo: "https://diy-llama-project.vercel.app",
+      },
     });
   };
 
