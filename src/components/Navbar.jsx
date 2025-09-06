@@ -10,10 +10,10 @@ const Navbar = ({ activePage, setActivePage }) => {
   const supabase = createClient(
     process.env.NODE_ENV === "development"
       ? import.meta.env.VITE_SUPABASE_URL
-      : VITE_PUBLIC_SUPABASE_URL,
+      : process.env.VITE_PUBLIC_SUPABASE_URL,
     process.env.NODE_ENV === "development"
       ? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
-      : SUPABASE_ANON_KEY
+      : process.env.SUPABASE_ANON_KEY
   );
 
   const NavLink = ({ pageName }) => (
