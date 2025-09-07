@@ -2,15 +2,11 @@ import { useState } from "react";
 import FeiCraftLogo from "./FeiCraftLogo";
 import CloseMenuIcon from "./CloseMenuIcon";
 import MenuIcon from "./MenuIcon";
-import { createClient } from "@supabase/supabase-js";
+import { Link } from "react-router";
 
-const Navbar = ({ activePage, setActivePage }) => {
+const Navbar = ({ activePage, setActivePage, session }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navLinks = ["Home", "ChatFeiCraft", "About FeiCraft", "Creators"];
-  const supabase = createClient(
-    import.meta.env.VITE_PUBLIC_SUPABASE_URL,
-    import.meta.env.VITE_PUBLIC_SUPABASE_ANON_KEY
-  );
+  const navLinks = ["Home", "ChatFeiCraft", "About FeiCraft"];
 
   const NavLink = ({ pageName }) => (
     <a
@@ -29,47 +25,6 @@ const Navbar = ({ activePage, setActivePage }) => {
       {pageName}
     </a>
   );
-
-  const handleSignInGoogle = async () => {
-    return supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: "https://diy-llama-project.vercel.app",
-      },
-    });
-  };
-
-  const handleAfterSignIn = async (request) => {
-    const { searchParams, orgin } = new URL(request.url);
-    const code = searchParams.get("code");
-    // if "next" is in param, use it as the redirect URL
-    let next = searchParams.get("next") ?? "/";
-    if (!next.startsWith("/")) {
-      // if "next" is not a relative URL, use the default
-      next = "/";
-    }
-
-    if (code) {
-      const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-      if (!error) {
-        const forwardedHost = request.headers.get("x-forwarded-host");
-        const isLocalEnv = process.env.NODE_ENV === "development";
-
-        if (isLocalEnv) {
-          const redirectUrl = origin + next;
-
-          return (window.location.href = redirectUrl);
-        } else if (forwardedHost) {
-          return (window.location.href = `https://${forwardedHost}/${next}`);
-        } else {
-          return (window.location.href = `${origin}${next}`);
-        }
-      }
-    }
-
-    return (window.location.href = `${origin}/auth/auth-code-error`);
-  };
 
   return (
     <nav className="bg-white/80 dark:bg-stone-900/80 backdrop-blur-sm shadow-md fixed w-full top-0 z-50">
@@ -95,13 +50,18 @@ const Navbar = ({ activePage, setActivePage }) => {
               {navLinks.map((link) => (
                 <NavLink key={link} pageName={link} />
               ))}
-              <a
-                href="#"
-                onClick={handleSignInGoogle}
-                className={`px-3 py-2 rounded-md text-sm font-bold transition-colors duration-200 text-stone-600 dark:text-stone-300 hover:text-emerald-600`}
-              >
-                Login
-              </a>
+              {session == null ? (
+                <Link
+                  href="/login"
+                  className={`px-3 py-2 rounded-md text-sm font-bold transition-colors duration-200 text-stone-600 dark:text-stone-300 hover:text-emerald-600`}
+                >
+                  Login
+                </Link>
+              ) : (
+                <span className="font-bold">
+                  {session.user.identities[0].identity_data.full_name}
+                </span>
+              )}
             </div>
           </div>
 
@@ -125,6 +85,18 @@ const Navbar = ({ activePage, setActivePage }) => {
             {navLinks.map((link) => (
               <NavLink key={link} pageName={link} />
             ))}
+            {session == null ? (
+              <Link
+                href="/login"
+                className={`px-3 py-2 rounded-md text-sm font-bold transition-colors duration-200 text-stone-600 dark:text-stone-300 hover:text-emerald-600`}
+              >
+                Login
+              </Link>
+            ) : (
+              <span className="font-bold">
+                {session.user.identities[0].identity_data.full_name}
+              </span>
+            )}
           </div>
         </div>
       )}
