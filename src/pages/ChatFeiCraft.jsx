@@ -1,24 +1,4 @@
-<<<<<<< HEAD
-import ImageInputForm from "../components/ImageInputForm";
 
-export default function ChatFeiCraft() {
-  return (
-    <div className="flex-grow flex flex-col items-center justify-center p-4">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl md:text-6xl font-extrabold text-gray-800 dark:text-white">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
-            Hello, Creator!
-          </span>
-        </h1>
-        <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
-          How can I help you today?
-        </p>
-      </div>
-      <ImageInputForm />
-    </div>
-  );
-}
-=======
 // ChatFeiCrafts.jsx
 // Full integrated ChatFeiCrafts with:
 // - Gamification (badges + levels)
@@ -795,4 +775,3 @@ const ChatFeiCrafts = () => {
 };
 
 export default ChatFeiCrafts;
->>>>>>> Upload chatbot code without next/prev
