@@ -74,49 +74,40 @@ const Home = () => {
       // convert images to base64
       const base64images = await fileToBase64(imageFile);
 
-      const fileName = `${new Date().getTime()}_${imageFile.name}`;
-      const { error, status } = await supabase.storage
-        .from("images")
-        .upload(fileName, imageFile);
-
-      if (error) return console.error("Error: " + error.message);
-
       const apiKey = import.meta.env.VITE_LLAMA_API_KEY;
 
-      if (status === 201) {
-        const response = await fetch(
-          "https://openrouter.ai/api/v1/chat/completions",
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-              "HTTP-Referer": "https://diy-llama-project.vercel.app", // Optional. Site URL for rankings on openrouter.ai.
-              "X-Title": "DIY Llama Project", // Optional. Site title for rankings on openrouter.ai.
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: "meta-llama/llama-3.2-90b-vision-instruct",
-              messages: [
-                {
-                  role: "user",
-                  content: [
-                    {
-                      type: "text",
-                      text: "Apakah Anda bisa melihat gambar berikut? Coba jelaskan!",
+      const response = await fetch(
+        "https://openrouter.ai/api/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "HTTP-Referer": "https://diy-llama-project.vercel.app", // Optional. Site URL for rankings on openrouter.ai.
+            "X-Title": "DIY Llama Project", // Optional. Site title for rankings on openrouter.ai.
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "meta-llama/llama-3.2-90b-vision-instruct",
+            messages: [
+              {
+                role: "user",
+                content: [
+                  {
+                    type: "text",
+                    text: "Apakah Anda bisa melihat gambar berikut? Coba jelaskan!",
+                  },
+                  {
+                    type: "image_url",
+                    image_url: {
+                      url: base64images,
                     },
-                    {
-                      type: "image_url",
-                      image_url: {
-                        url: base64images,
-                      },
-                    },
-                  ],
-                },
-              ],
-            }),
-          }
-        );
-      }
+                  },
+                ],
+              },
+            ],
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
