@@ -2,21 +2,16 @@ import { useState } from "react";
 import FeiCraftLogo from "./FeiCraftLogo";
 import CloseMenuIcon from "./CloseMenuIcon";
 import MenuIcon from "./MenuIcon";
-<<<<<<< HEAD
+import { Link } from "react-router";
 import { createClient } from "@supabase/supabase-js";
-=======
->>>>>>> Upload chatbot code without next/prev
 
-const Navbar = ({ activePage, setActivePage }) => {
+const Navbar = ({ activePage, setActivePage, session }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navLinks = ["Home", "ChatFeiCraft", "About FeiCraft", "Creators"];
-<<<<<<< HEAD
   const supabase = createClient(
     import.meta.env.VITE_PUBLIC_SUPABASE_URL,
     import.meta.env.VITE_PUBLIC_SUPABASE_ANON_KEY
   );
-=======
->>>>>>> Upload chatbot code without next/prev
 
   const NavLink = ({ pageName }) => (
     <a
@@ -36,7 +31,6 @@ const Navbar = ({ activePage, setActivePage }) => {
     </a>
   );
 
-<<<<<<< HEAD
   const handleSignInGoogle = async () => {
     return supabase.auth.signInWithOAuth({
       provider: "google",
@@ -78,8 +72,6 @@ const Navbar = ({ activePage, setActivePage }) => {
     return (window.location.href = `${origin}/auth/auth-code-error`);
   };
 
-=======
->>>>>>> Upload chatbot code without next/prev
   return (
     <nav className="bg-white/80 dark:bg-stone-900/80 backdrop-blur-sm shadow-md fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -104,7 +96,6 @@ const Navbar = ({ activePage, setActivePage }) => {
               {navLinks.map((link) => (
                 <NavLink key={link} pageName={link} />
               ))}
-<<<<<<< HEAD
               <a
                 href="#"
                 onClick={handleSignInGoogle}
@@ -112,8 +103,6 @@ const Navbar = ({ activePage, setActivePage }) => {
               >
                 Login
               </a>
-=======
->>>>>>> Upload chatbot code without next/prev
             </div>
           </div>
 
@@ -137,6 +126,18 @@ const Navbar = ({ activePage, setActivePage }) => {
             {navLinks.map((link) => (
               <NavLink key={link} pageName={link} />
             ))}
+            {session == null ? (
+              <Link
+                href="/login"
+                className={`px-3 py-2 rounded-md text-sm font-bold transition-colors duration-200 text-stone-600 dark:text-stone-300 hover:text-emerald-600`}
+              >
+                Login
+              </Link>
+            ) : (
+              <span className="font-bold">
+                {session.user.identities[0].identity_data.full_name}
+              </span>
+            )}
           </div>
         </div>
       )}
