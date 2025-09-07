@@ -3,17 +3,20 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Creators from "./pages/Creators";
 import Navbar from "./components/Navbar";
+import ChatFeiCraft from "./pages/ChatFeiCraft";
+import WorkshopMode from "./pages/WorkshopMode";
+
 
 export default function App() {
   const [activePage, setActivePage] = useState("Home");
-
-  // A simple function to render page content based on the active page
   const renderPageContent = () => {
     switch (activePage) {
       case "Home":
         return <Home />;
-      case "About FeiCraft":
-        return <About />;
+      case "ChatFeiCraft":   
+        return <ChatFeiCraft />;
+      case "WorkshopMode":
+        return <WorkshopMode />;
       case "Creators":
         return <Creators />;
       default:
@@ -26,11 +29,12 @@ export default function App() {
   };
 
   return (
-    // The main container for the entire app
+
     <div className="h-screen bg-orange-50 dark:bg-stone-900 text-stone-800 dark:text-stone-200 font-sans flex flex-col transition-colors duration-300">
+      {}
       <Navbar activePage={activePage} setActivePage={setActivePage} />
 
-      {/* Main content area */}
+      {}
       <main className="flex-grow flex items-center justify-center pt-16">
         {renderPageContent()}
       </main>
