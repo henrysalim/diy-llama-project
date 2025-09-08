@@ -1,4 +1,3 @@
-
 // ChatFeiCrafts.jsx
 // Full integrated ChatFeiCrafts with:
 // - Gamification (badges + levels)
@@ -46,8 +45,7 @@ const ChatFeiCrafts = () => {
   const [level, setLevel] = useState("Beginner"); // gamified level by badges
   const messagesEndRef = useRef(null);
 
-  const apiKey =
-    "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";
+  const apiKey = `${import.meta.env.VITE_LLAMA_API_KEY}`;
 
   // -------------------------
   // Utilities
@@ -98,7 +96,11 @@ const ChatFeiCrafts = () => {
           });
         } else {
           // merge into paragraph
-          currentParagraph.push(...currentChecklist.map((s) => s.replace(/^[-*•\u2022]?\s*|\d+\.\s*/g, "").trim()));
+          currentParagraph.push(
+            ...currentChecklist.map((s) =>
+              s.replace(/^[-*•\u2022]?\s*|\d+\.\s*/g, "").trim()
+            )
+          );
         }
         currentChecklist = [];
       }
@@ -143,7 +145,9 @@ const ChatFeiCrafts = () => {
                   ? {
                       ...block,
                       items: block.items.map((step) =>
-                        step.id === stepId ? { ...step, done: !step.done } : step
+                        step.id === stepId
+                          ? { ...step, done: !step.done }
+                          : step
                       ),
                     }
                   : block
@@ -162,8 +166,10 @@ const ChatFeiCrafts = () => {
 
       // Achievement: unlock badge when certain milestones reached
       const newlyUnlocked = [];
-      if (done >= 5 && !badges.includes("Craft Explorer")) newlyUnlocked.push("Craft Explorer");
-      if (done >= 12 && !badges.includes("Master Doer")) newlyUnlocked.push("Master Doer");
+      if (done >= 5 && !badges.includes("Craft Explorer"))
+        newlyUnlocked.push("Craft Explorer");
+      if (done >= 12 && !badges.includes("Master Doer"))
+        newlyUnlocked.push("Master Doer");
 
       if (newlyUnlocked.length > 0) {
         const newBadges = [...badges, ...newlyUnlocked];
@@ -192,7 +198,10 @@ const ChatFeiCrafts = () => {
     if (!match) return [];
     const listPart = match[1];
     // split by comma or " dan " or " & "
-    const parts = listPart.split(/\s*(?:,|dan|&)\s*/i).map((p) => p.trim()).filter(Boolean);
+    const parts = listPart
+      .split(/\s*(?:,|dan|&)\s*/i)
+      .map((p) => p.trim())
+      .filter(Boolean);
     // cleanup short words
     return parts.map((p) => p.replace(/[.?!]$/, "")).filter(Boolean);
   };
@@ -206,13 +215,16 @@ const ChatFeiCrafts = () => {
       let styleGuide = "";
       switch (mood) {
         case "Enthusiastic":
-          styleGuide = "Be upbeat, encouraging, and vivid. Use short energetic lines and emojis when appropriate.";
+          styleGuide =
+            "Be upbeat, encouraging, and vivid. Use short energetic lines and emojis when appropriate.";
           break;
         case "Minimal":
-          styleGuide = "Be minimal and concise. Use short sentences and avoid fluff.";
+          styleGuide =
+            "Be minimal and concise. Use short sentences and avoid fluff.";
           break;
         case "Mentor":
-          styleGuide = "Be instructive and patient, give helpful tips and safety notes.";
+          styleGuide =
+            "Be instructive and patient, give helpful tips and safety notes.";
           break;
         default:
           styleGuide = "Be friendly, clear, and approachable.";
@@ -220,20 +232,23 @@ const ChatFeiCrafts = () => {
 
       const systemMsg = `You are FeiCraft, an AI assistant specialized in DIY and crafts. ${styleGuide} Always focus on practical steps, materials and helpful tips. If the user asks for "langkah" or "bahan" produce clear bullet points. When possible include short 'Estimasi waktu' and 'Estimasi biaya' lines. If the question is not DIY-related, politely refuse.`;
 
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "meta-llama/llama-4-maverick",
-          messages: [
-            { role: "system", content: systemMsg },
-            { role: "user", content: userPrompt },
-          ],
-        }),
-      });
+      const response = await fetch(
+        "https://openrouter.ai/api/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "meta-llama/llama-4-maverick",
+            messages: [
+              { role: "system", content: systemMsg },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errBody = await response.json().catch(() => ({}));
@@ -254,8 +269,15 @@ const ChatFeiCrafts = () => {
     // simple heuristics
     let complexity = "Simple";
     const r = reply.toLowerCase();
-    if (r.includes("cat") || r.includes("jahit") || r.includes("tenun")) complexity = "Medium";
-    if (r.includes("kayu") || r.includes("bor") || r.includes("listrik") || r.includes("lampu")) complexity = "Complex";
+    if (r.includes("cat") || r.includes("jahit") || r.includes("tenun"))
+      complexity = "Medium";
+    if (
+      r.includes("kayu") ||
+      r.includes("bor") ||
+      r.includes("listrik") ||
+      r.includes("lampu")
+    )
+      complexity = "Complex";
 
     const map = {
       Simple: { time: "± 20-40 menit", cost: "Rp10.000 – Rp40.000" },
@@ -283,7 +305,9 @@ const ChatFeiCrafts = () => {
   // Simpan ke localStorage
   const handleSaveHistory = () => {
     if (messages.length === 0) return alert("Belum ada chat.");
-    const history = JSON.parse(localStorage.getItem("feicraft-history") || "[]");
+    const history = JSON.parse(
+      localStorage.getItem("feicraft-history") || "[]"
+    );
     const newHistory = [
       {
         id: Date.now(),
@@ -295,7 +319,6 @@ const ChatFeiCrafts = () => {
     localStorage.setItem("feicraft-history", JSON.stringify(newHistory));
     alert("✅ Riwayat chat disimpan! Lihat di menu History.");
   };
-
 
   // -------------------------
   // Main submit handler
@@ -331,12 +354,18 @@ const ChatFeiCrafts = () => {
     }
 
     // validate DIY keyword presence
-    const isDIY = /(DIY|buat sendiri|kerajinan|prakarya|handmade)/i.test(userInput);
+    const isDIY = /(DIY|buat sendiri|kerajinan|prakarya|handmade)/i.test(
+      userInput
+    );
     if (!isDIY) {
       setMessages((prev) => {
         const next = [
           ...prev,
-          { role: "bot", content: "🙏 Maaf, FeiCraft fokus ke DIY. Tambahkan kata 'DIY', 'kerajinan', atau 'handmade' ya." },
+          {
+            role: "bot",
+            content:
+              "🙏 Maaf, FeiCraft fokus ke DIY. Tambahkan kata 'DIY', 'kerajinan', atau 'handmade' ya.",
+          },
         ];
         persist(STORAGE_KEYS.MSGS, next);
         return next;
@@ -346,7 +375,9 @@ const ChatFeiCrafts = () => {
     }
 
     // determine whether the user explicitly asked for steps/bahan (only then create checklist)
-    const wantsChecklist = /(langkah|bahan|step|steps|materials?)/i.test(userInput);
+    const wantsChecklist = /(langkah|bahan|step|steps|materials?)/i.test(
+      userInput
+    );
 
     // show loading bot bubble
     setMessages((prev) => {
@@ -358,7 +389,9 @@ const ChatFeiCrafts = () => {
     // include memory of materials to improve suggestion if present
     let promptWithContext = userInput;
     if (materials.length > 0) {
-      promptWithContext += `\n\nContext bahan yang tersedia: ${materials.join(", ")}. Mohon prioritaskan ide yang menggunakan bahan tersebut jika memungkinkan.`;
+      promptWithContext += `\n\nContext bahan yang tersedia: ${materials.join(
+        ", "
+      )}. Mohon prioritaskan ide yang menggunakan bahan tersebut jika memungkinkan.`;
     }
 
     // call LLaMA
@@ -380,11 +413,17 @@ const ChatFeiCrafts = () => {
     });
 
     // update progress counters (total steps)
-    const allSteps = blocks.filter((b) => b.type === "checklist").flatMap((b) => b.items || []);
+    const allSteps = blocks
+      .filter((b) => b.type === "checklist")
+      .flatMap((b) => b.items || []);
     setProgress({ done: 0, total: allSteps.length });
 
     // if this was a randomly generated idea, mark it used (prevent repetition)
-    if (/^DIY/i.test(userInput) || /DIY/i.test(userInput) || userInput.startsWith("DIY ")) {
+    if (
+      /^DIY/i.test(userInput) ||
+      /DIY/i.test(userInput) ||
+      userInput.startsWith("DIY ")
+    ) {
       // user explicitly requested a DIY; nothing to do
     } else {
       // check if this message came from a randomIdea invocation (we control random invocation separately)
@@ -446,7 +485,10 @@ const ChatFeiCrafts = () => {
   // Load progress & badges on mount
   // -------------------------
   useEffect(() => {
-    const allSteps = messages.flatMap((m) => m.blocks || []).filter((b) => b.type === "checklist").flatMap((b) => b.items || []);
+    const allSteps = messages
+      .flatMap((m) => m.blocks || [])
+      .filter((b) => b.type === "checklist")
+      .flatMap((b) => b.items || []);
     const done = allSteps.filter((it) => it.done).length;
     setProgress({ done, total: allSteps.length });
   }, []); // eslint-disable-line
@@ -470,8 +512,12 @@ const ChatFeiCrafts = () => {
       <>
         {(timeMatch || costMatch) && (
           <div className="mt-2 flex gap-3 text-xs text-stone-500">
-            {timeMatch && <span className="px-2 py-1 bg-stone-100 rounded">{`⏱ ${timeMatch[1].trim()}`}</span>}
-            {costMatch && <span className="px-2 py-1 bg-stone-100 rounded">{`💰 ${costMatch[1].trim()}`}</span>}
+            {timeMatch && (
+              <span className="px-2 py-1 bg-stone-100 rounded">{`⏱ ${timeMatch[1].trim()}`}</span>
+            )}
+            {costMatch && (
+              <span className="px-2 py-1 bg-stone-100 rounded">{`💰 ${costMatch[1].trim()}`}</span>
+            )}
           </div>
         )}
       </>
@@ -482,15 +528,18 @@ const ChatFeiCrafts = () => {
   // Render component
   // -------------------------
   return (
-    <div className="flex flex-col min-h-screen bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-white">
+    <div className="flex flex-col h-screen bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-white">
       {/* Top navbar */}
       <header className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white p-4 shadow-md">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-extrabold">✨ FeiCraft</h1>
-            <p className="text-sm opacity-90">AI DIY Companion — checklist, estimator, memory bahan & gamified journey</p>
+            <p className="text-sm opacity-90">
+              AI DIY Companion — checklist, estimator, memory bahan & gamified
+              journey
+            </p>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <div className="text-right">
               <div className="text-xs opacity-90">Level</div>
@@ -503,7 +552,10 @@ const ChatFeiCrafts = () => {
                   <span className="text-xs opacity-80">No badges yet</span>
                 ) : (
                   badges.map((b, i) => (
-                    <span key={i} className="bg-yellow-300 text-xs px-2 py-1 rounded-full font-medium">
+                    <span
+                      key={i}
+                      className="bg-yellow-300 text-xs px-2 py-1 rounded-full font-medium"
+                    >
                       {b}
                     </span>
                   ))
@@ -526,7 +578,9 @@ const ChatFeiCrafts = () => {
             </button>
             <button
               onClick={() => {
-                const sample = prompt("Masukkan bahan yang kamu punya, pisahkan koma (contoh: botol plastik, kardus)");
+                const sample = prompt(
+                  "Masukkan bahan yang kamu punya, pisahkan koma (contoh: botol plastik, kardus)"
+                );
                 if (sample) {
                   // simulate user typing "aku punya ..." to trigger material memory logic
                   const text = `Aku punya ${sample}`;
@@ -580,15 +634,26 @@ const ChatFeiCrafts = () => {
                   <div className="h-full flex items-center justify-center text-stone-400">
                     <div className="text-center">
                       <p className="text-lg">👋 Hai! Saya FeiCraft.</p>
-                      <p className="text-sm mt-1">Mulai dengan pertanyaan DIY atau klik Ide Acak ✨</p>
+                      <p className="text-sm mt-1">
+                        Mulai dengan pertanyaan DIY atau klik Ide Acak ✨
+                      </p>
                     </div>
                   </div>
                 ) : (
                   messages.map((msg, idx) => (
-                    <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                    <div
+                      key={idx}
+                      className={`flex ${
+                        msg.role === "user" ? "justify-end" : "justify-start"
+                      }`}
+                    >
                       <div
                         className={`max-w-[80%] p-3 rounded-2xl shadow-sm text-sm whitespace-pre-wrap ${
-                          msg.role === "user" ? "bg-emerald-500 text-white" : msg.content === "..." ? "bg-stone-100 italic text-stone-500" : "bg-stone-50 dark:bg-stone-700 text-stone-800 dark:text-stone-100"
+                          msg.role === "user"
+                            ? "bg-emerald-500 text-white"
+                            : msg.content === "..."
+                            ? "bg-stone-100 italic text-stone-500"
+                            : "bg-stone-50 dark:bg-stone-700 text-stone-800 dark:text-stone-100"
                         }`}
                       >
                         {msg.blocks ? (
@@ -596,16 +661,31 @@ const ChatFeiCrafts = () => {
                             {msg.blocks.map((block, bIdx) =>
                               block.type === "checklist" ? (
                                 <div key={bIdx}>
-                                  <p className="mb-1 font-semibold">📋 Langkah / Bahan</p>
+                                  <p className="mb-1 font-semibold">
+                                    📋 Langkah / Bahan
+                                  </p>
                                   <ul className="space-y-1">
                                     {block.items.map((it) => (
-                                      <li key={it.id} className="flex items-center gap-2">
+                                      <li
+                                        key={it.id}
+                                        className="flex items-center gap-2"
+                                      >
                                         <input
                                           type="checkbox"
                                           checked={it.done}
-                                          onChange={() => toggleChecklist(idx, bIdx, it.id)}
+                                          onChange={() =>
+                                            toggleChecklist(idx, bIdx, it.id)
+                                          }
                                         />
-                                        <span className={it.done ? "line-through text-stone-400" : ""}>{it.text}</span>
+                                        <span
+                                          className={
+                                            it.done
+                                              ? "line-through text-stone-400"
+                                              : ""
+                                          }
+                                        >
+                                          {it.text}
+                                        </span>
                                       </li>
                                     ))}
                                   </ul>
@@ -642,56 +722,72 @@ const ChatFeiCrafts = () => {
 
           {/* Right column: materials, progress, quick-actions */}
           {/* Materials + progress panes */}
-        <aside className="bg-white dark:bg-stone-800 rounded-xl p-4 shadow flex flex-col gap-4">
-          <div>
-            <h3 className="text-sm font-semibold">🧰 Materials (ingat sesi)</h3>
-            {materials.length === 0 ? (
-              <p className="text-xs mt-2 text-stone-500">
-                Belum ada bahan tersimpan. Tambah via tombol "Tambah Bahan" atau ketik "aku punya ..." di chat.
-              </p>
-            ) : (
-              <div className="mt-2 flex flex-wrap gap-2">
-                {materials.map((m, i) => (
-                  <span
-                    key={i}
-                    className="bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full text-xs"
-                  >
-                    {m}
-                  </span>
-                ))}
-              </div>
-            )}
+          <aside className="bg-white dark:bg-stone-800 rounded-xl p-4 shadow flex flex-col gap-4">
+            <div>
+              <h3 className="text-sm font-semibold">
+                🧰 Materials (ingat sesi)
+              </h3>
+              {materials.length === 0 ? (
+                <p className="text-xs mt-2 text-stone-500">
+                  Belum ada bahan tersimpan. Tambah via tombol "Tambah Bahan"
+                  atau ketik "aku punya ..." di chat.
+                </p>
+              ) : (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {materials.map((m, i) => (
+                    <span
+                      key={i}
+                      className="bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full text-xs"
+                    >
+                      {m}
+                    </span>
+                  ))}
+                </div>
+              )}
 
-            {materials.length > 0 && (
-              <div className="mt-3 flex flex-col gap-2">
-                <button
-                  onClick={() => {
-                    const prompt = `${materials.join(", ")}. Apa ide DIY yang bisa saya buat dari ini? Berikan langkahnya juga!`;
-                    handleSubmit(prompt);
-                  }}
-                  className="px-3 py-2 bg-emerald-500 text-white rounded-md text-sm hover:bg-emerald-600"
-                >
-                  ✨ Gunakan bahan ini
-                </button>
-                <button
-                  onClick={() => {
-                    if (!confirm("Hapus semua bahan yang tersimpan?")) return;
-                    setMaterials([]);
-                    persist(STORAGE_KEYS.MATERIALS, []);
-                  }}
-                  className="text-xs text-red-500"
-                >
-                  Hapus bahan tersimpan
-                </button>
-              </div>
-            )}
-          </div>
+              {materials.length > 0 && (
+                <div className="mt-3 flex flex-col gap-2">
+                  <button
+                    onClick={() => {
+                      const prompt = `${materials.join(
+                        ", "
+                      )}. Apa ide DIY yang bisa saya buat dari ini? Berikan langkahnya juga!`;
+                      handleSubmit(prompt);
+                    }}
+                    className="px-3 py-2 bg-emerald-500 text-white rounded-md text-sm hover:bg-emerald-600"
+                  >
+                    ✨ Gunakan bahan ini
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (!confirm("Hapus semua bahan yang tersimpan?")) return;
+                      setMaterials([]);
+                      persist(STORAGE_KEYS.MATERIALS, []);
+                    }}
+                    className="text-xs text-red-500"
+                  >
+                    Hapus bahan tersimpan
+                  </button>
+                </div>
+              )}
+            </div>
 
             <div>
               <h3 className="text-sm font-semibold">📈 Progress</h3>
-              <div className="text-xs text-stone-500 mt-1">{progress.done}/{progress.total} langkah selesai</div>
+              <div className="text-xs text-stone-500 mt-1">
+                {progress.done}/{progress.total} langkah selesai
+              </div>
               <div className="w-full bg-stone-200 rounded-full h-2 mt-2">
-                <div className="bg-emerald-500 h-2 rounded-full" style={{ width: `${progress.total === 0 ? 0 : (progress.done / progress.total) * 100}%` }} />
+                <div
+                  className="bg-emerald-500 h-2 rounded-full"
+                  style={{
+                    width: `${
+                      progress.total === 0
+                        ? 0
+                        : (progress.done / progress.total) * 100
+                    }%`,
+                  }}
+                />
               </div>
             </div>
 
@@ -713,12 +809,26 @@ const ChatFeiCrafts = () => {
                 </button>
                 <button
                   onClick={() => {
-                    const lastBot = [...messages].reverse().find((m) => m.role === "bot" && m.content);
-                    if (!lastBot) return alert("Belum ada jawaban bot untuk diexport.");
+                    const lastBot = [...messages]
+                      .reverse()
+                      .find((m) => m.role === "bot" && m.content);
+                    if (!lastBot)
+                      return alert("Belum ada jawaban bot untuk diexport.");
                     // export to workshop by storing minimal payload
-                    const payload = { title: lastBot.content.slice(0, 80), blocks: lastBot.blocks || [{ type: "paragraph", content: lastBot.content }], meta: {} };
-                    localStorage.setItem("feicraft-workshop", JSON.stringify(payload));
-                    alert("Export ke Workshop siap! Buka halaman Workshop untuk melihatnya.");
+                    const payload = {
+                      title: lastBot.content.slice(0, 80),
+                      blocks: lastBot.blocks || [
+                        { type: "paragraph", content: lastBot.content },
+                      ],
+                      meta: {},
+                    };
+                    localStorage.setItem(
+                      "feicraft-workshop",
+                      JSON.stringify(payload)
+                    );
+                    alert(
+                      "Export ke Workshop siap! Buka halaman Workshop untuk melihatnya."
+                    );
                   }}
                   className="px-3 py-2 bg-sky-500 text-white rounded-md text-sm"
                 >
@@ -728,18 +838,33 @@ const ChatFeiCrafts = () => {
                 <button
                   onClick={() => {
                     // save last bot to gallery (local storage)
-                    const lastBot = [...messages].reverse().find((m) => m.role === "bot" && m.content);
-                    if (!lastBot) return alert("Belum ada balasan bot untuk disimpan.");
-                    const gallery = JSON.parse(localStorage.getItem("feicraft-gallery") || "[]");
-                    gallery.unshift({ id: Date.now(), content: lastBot.content, blocks: lastBot.blocks || null, date: new Date().toISOString() });
-                    localStorage.setItem("feicraft-gallery", JSON.stringify(gallery));
+                    const lastBot = [...messages]
+                      .reverse()
+                      .find((m) => m.role === "bot" && m.content);
+                    if (!lastBot)
+                      return alert("Belum ada balasan bot untuk disimpan.");
+                    const gallery = JSON.parse(
+                      localStorage.getItem("feicraft-gallery") || "[]"
+                    );
+                    gallery.unshift({
+                      id: Date.now(),
+                      content: lastBot.content,
+                      blocks: lastBot.blocks || null,
+                      date: new Date().toISOString(),
+                    });
+                    localStorage.setItem(
+                      "feicraft-gallery",
+                      JSON.stringify(gallery)
+                    );
                     // unlock badge for saving
                     if (!badges.includes("Archivist")) {
                       const newBadges = [...badges, "Archivist"];
                       setBadges(newBadges);
                       persist(STORAGE_KEYS.BADGES, newBadges);
                       setLevel(recomputeLevel(newBadges));
-                      alert("🏅 Badge unlocked: Archivist (Ide tersimpan ke gallery)");
+                      alert(
+                        "🏅 Badge unlocked: Archivist (Ide tersimpan ke gallery)"
+                      );
                     } else {
                       alert("Disimpan ke gallery!");
                     }
@@ -763,11 +888,14 @@ const ChatFeiCrafts = () => {
           </aside>
         </div>
 
-        
-
         {/* Footer: small notes */}
         <div className="text-xs text-stone-500 text-center">
-          <span>FeiCraft — fokus pada pengalaman praktis DIY: langkah nyata, estimasi waktu & biaya, serta ingatan bahanmu. Untuk hackathon: tunjukkan export Workshop, Gallery & Badges sebagai unique selling points.</span>
+          <span>
+            FeiCraft — fokus pada pengalaman praktis DIY: langkah nyata,
+            estimasi waktu & biaya, serta ingatan bahanmu. Untuk hackathon:
+            tunjukkan export Workshop, Gallery & Badges sebagai unique selling
+            points.
+          </span>
         </div>
       </main>
     </div>
