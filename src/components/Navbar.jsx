@@ -6,7 +6,7 @@ import { Link } from "react-router";
 
 const Navbar = ({ activePage, setActivePage, session }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navLinks = ["Home", "ChatFeiCraft", "About FeiCraft", "Creators"];
+  const navLinks = ["Home", "ChatFeiCraft", "About FeiCraft"];
 
   const NavLink = ({ pageName }) => (
     <a
@@ -52,7 +52,7 @@ const Navbar = ({ activePage, setActivePage, session }) => {
               ))}
               {session == null ? (
                 <Link
-                  href="/login"
+                  to="/login"
                   className={`px-3 py-2 rounded-md text-sm font-bold transition-colors duration-200 text-stone-600 dark:text-stone-300 hover:text-emerald-600`}
                 >
                   Login
@@ -87,7 +87,7 @@ const Navbar = ({ activePage, setActivePage, session }) => {
             ))}
             {session == null ? (
               <Link
-                href="/login"
+                to="/login"
                 className={`px-3 py-2 rounded-md text-sm font-bold transition-colors duration-200 text-stone-600 dark:text-stone-300 hover:text-emerald-600`}
               >
                 Login

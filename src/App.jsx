@@ -1,5 +1,4 @@
 import Home from "./pages/Home";
-import Creators from "./pages/Creators";
 import Navbar from "./components/Navbar";
 import ChatFeiCraft from "./pages/ChatFeiCraft";
 import WorkshopMode from "./pages/WorkshopMode";
@@ -10,7 +9,6 @@ import { supabase } from "./auth/supabase";
 export default function App() {
   const [activePage, setActivePage] = useState("Home");
   const [session, setSession] = useState(null);
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
     // Remove the hash fragment after login
@@ -40,8 +38,6 @@ export default function App() {
         return <ChatFeiCraft />;
       case "WorkshopMode":
         return <WorkshopMode />;
-      case "Creators":
-        return <Creators />;
       default:
         return (
           <div className="text-center">
