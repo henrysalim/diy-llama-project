@@ -6,8 +6,7 @@ const WorkshopMode = () => {
   const [loading, setLoading] = useState(false);
   const [input, setInput] = useState("");
 
-  const apiKey =
-    "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";
+  const apiKey = `${import.meta.env.VITE_LLAMA_API_KEY}`;
 
   // Ambil tutorial step-by-step dari LLaMA API
   const generateWorkshop = async () => {
