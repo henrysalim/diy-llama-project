@@ -23,6 +23,9 @@ export default function Login() {
   const handleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        redirectTo: "https://diy-llama-project.vercel.app",
+      },
     });
 
     if (error) console.error("Error logging in: " + error.message);
