@@ -5,13 +5,13 @@ export default function Login() {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session?.user ?? null);
     });
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      setSession(session?.user ?? null);
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -23,9 +23,9 @@ export default function Login() {
   const handleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      // options: {
-      //   redirectTo: "https://diy-llama-project.vercel.app",
-      // },
+      options: {
+        redirectTo: "http://localhost:5173",
+      },
     });
 
     if (error) console.error("Error logging in: " + error.message);

@@ -11,22 +11,28 @@ export default function App() {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
-    // Remove the hash fragment after login
-    if (window.location.hash.includes("access_token")) {
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
+    const getSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) console.error(error.message);
+      else {
+        setSession(data.user?.identities[0].identity_data ?? null);
+      }
+    };
+
+    getSession();
   }, []);
+  console.log(session);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-    return () => subscription.unsubscribe();
+    const { data: subscription } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session?.user.identities[0].identity_data ?? null); // ✅ update state whenever session changes
+      }
+    );
+
+    return () => {
+      subscription.subscription.unsubscribe();
+    };
   }, []);
 
   // A simple function to render page content based on the active page
@@ -34,7 +40,7 @@ export default function App() {
     switch (activePage) {
       case "Home":
         return <Home />;
-      case "ChatFeiCraft":   
+      case "ChatFeiCraft":
         return <ChatFeiCraft />;
       case "WorkshopMode":
         return <WorkshopMode />;
@@ -48,7 +54,6 @@ export default function App() {
   };
 
   return (
-
     <div className="h-screen bg-orange-50 dark:bg-stone-900 text-stone-800 dark:text-stone-200 font-sans flex flex-col transition-colors duration-300">
       <Navbar
         session={session}
