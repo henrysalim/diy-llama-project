@@ -24,7 +24,10 @@ export default function Login() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "http://localhost:5173",
+        redirectTo:
+          process.env.NODE_ENV == "production"
+            ? "https://diy-with-llama.vercel.app"
+            : "http://localhost:5173",
       },
     });
 
