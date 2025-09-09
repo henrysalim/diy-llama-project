@@ -1,12 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import ImageInputForm from "../components/ImageInputForm";
+import { supabase } from "../auth/supabase";
+import Login from "./Login";
+import { span } from "framer-motion/client";
 
-const Home = () => {
+const Home = ({ session }) => {
   const [imageFile, setImageFile] = useState("");
   const [imagePreview, setImagePreview] = useState("");
   const fileInputRef = useRef(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiResponse, setApiResponse] = useState("");
+  let filePath;
+
+  const getUser = async () => {
+    return await supabase.auth.getUser();
+  };
 
   useEffect(() => {
     return () => {
@@ -43,19 +51,49 @@ const Home = () => {
     }
   };
 
-  const fileToBase64 = (file) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
-
   const clearImage = () => {
     if (imagePreview && imageFile) {
-      setImageFile(URL.revokeObjectURL(imageFile));
-      setImagePreview(URL.revokeObjectURL(imagePreview));
+      setImageFile(null);
+      setImagePreview(null);
     }
+  };
+
+  const uploadImage = async (file) => {
+    // 1. Get the logged-in user
+    const {
+      data: { user },
+      error: userError,
+    } = await getUser();
+
+    if (userError || !user) {
+      console.error("No logged-in user:", userError);
+      return null;
+    }
+
+    // 2. Build a unique path in the bucket
+    filePath = `${user.id}/${Date.now()}-${file.name}`;
+
+    // 3. Upload the file
+    const { error: uploadError } = await supabase.storage
+      .from("images")
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error("Upload failed:", uploadError.message);
+      return null;
+    }
+
+    return filePath;
+  };
+
+  const getPublicUrl = async () => {
+    const { data, error } = await supabase.storage
+      .from("images")
+      .createSignedUrl(filePath, 60 * 60); // 1 hour
+
+    if (error) console.error(error);
+
+    return data.signedUrl;
   };
 
   const handleSubmit = async (e) => {
@@ -65,16 +103,11 @@ const Home = () => {
     setIsSubmitting(true);
     setApiResponse("");
 
-    function getFileNameWithExtension(path) {
-      const parts = path.split(/[/\\]/); // Splits by / or \
-      return parts.pop(); // Returns the last part (file name with extension)
-    }
-
     try {
-      // convert images to base64
-      const base64images = await fileToBase64(imageFile);
-
-      const apiKey = import.meta.env.VITE_LLAMA_API_KEY;
+      const filePath = await uploadImage(imageFile);
+      const apiKey = `${import.meta.env.VITE_LLAMA_API_KEY}`;
+      const publicUrl = await getPublicUrl(filePath);
+      console.log(publicUrl);
 
       const response = await fetch(
         "https://openrouter.ai/api/v1/chat/completions",
@@ -82,8 +115,8 @@ const Home = () => {
           method: "POST",
           headers: {
             Authorization: `Bearer ${apiKey}`,
-            "HTTP-Referer": "https://diy-llama-project.vercel.app", // Optional. Site URL for rankings on openrouter.ai.
-            "X-Title": "DIY Llama Project", // Optional. Site title for rankings on openrouter.ai.
+            "HTTP-Referer": "https://diy-llama-project.vercel.app",
+            "X-Title": "DIY Llama Project",
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -94,12 +127,12 @@ const Home = () => {
                 content: [
                   {
                     type: "text",
-                    text: "Apakah Anda bisa melihat gambar berikut? Coba jelaskan!",
+                    text: "Could you see the image?",
                   },
                   {
                     type: "image_url",
                     image_url: {
-                      url: base64images,
+                      url: `${publicUrl}`,
                     },
                   },
                 ],
@@ -115,11 +148,11 @@ const Home = () => {
       }
 
       const data = await response.json();
-      console.log(data);
       // const message = data.choices[0].message.content;
-      // setApiResponse(message);
+      setApiResponse(data);
+      console.log(apiResponse);
     } catch (error) {
-      console.error("Error calling OpenRouter API: ", error);
+      console.error("Error calling OpenRouter API: ", error.message);
       setApiResponse(`Error: ${error.message}`);
     } finally {
       clearImage();
@@ -136,18 +169,26 @@ const Home = () => {
           </span>
         </h1>
         <p className="mt-4 text-lg text-stone-600 dark:text-stone-300">
-          How can I help you today?
+          {session != null
+            ? "How can I help you today?"
+            : "Please login first to continue"}
         </p>
       </div>
-      <ImageInputForm
-        imageFiles={imageFile}
-        imagePreviews={imagePreview}
-        fileInputRef={fileInputRef}
-        handleRemoveImage={handleRemoveImage}
-        handleSubmit={handleSubmit}
-        handleImageChange={handleImageChange}
-        triggerFileSelect={triggerFileSelect}
-      />
+      {session != null ? (
+        <ImageInputForm
+          imageFiles={imageFile}
+          imagePreviews={imagePreview}
+          fileInputRef={fileInputRef}
+          isSubmitting={isSubmitting}
+          handleRemoveImage={handleRemoveImage}
+          handleSubmit={handleSubmit}
+          handleImageChange={handleImageChange}
+          triggerFileSelect={triggerFileSelect}
+        />
+      ) : (
+        <Login />
+      )}
+      {isSubmitting && <p>Loading...</p>}
     </div>
   );
 };

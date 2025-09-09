@@ -21,7 +21,6 @@ export default function App() {
 
     getSession();
   }, []);
-  console.log(session);
 
   useEffect(() => {
     const { data: subscription } = supabase.auth.onAuthStateChange(
@@ -39,7 +38,7 @@ export default function App() {
   const renderPageContent = () => {
     switch (activePage) {
       case "Home":
-        return <Home />;
+        return <Home session={session} />;
       case "ChatFeiCraft":
         return <ChatFeiCraft />;
       case "WorkshopMode":
