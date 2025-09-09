@@ -9,6 +9,7 @@ const Navbar = ({ activePage, setActivePage, session }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navLinks = [
     { name: "Home", type: "link" },
+    { name: "ChatFeiCraft", type: "link" },
     { name: "About FeiCraft", type: "link" },
     { name: session?.full_name, type: "dropdown" },
   ];
@@ -126,15 +127,8 @@ const Navbar = ({ activePage, setActivePage, session }) => {
               {navLinks.map((item) =>
                 item.type === "link" ? (
                   <NavLink key={item.name} pageName={item.name} />
-                ) : session == null ? (
-                  <Link
-                    to="/login"
-                    className={`px-3 py-2 rounded-md text-sm font-bold transition-colors duration-200 text-stone-600 dark:text-stone-300 hover:text-emerald-600`}
-                  >
-                    Login
-                  </Link>
                 ) : (
-                  <Dropdown key={item.name} item={item} />
+                  session && <Dropdown key={item.name} item={item} />
                 )
               )}
             </div>
@@ -160,15 +154,8 @@ const Navbar = ({ activePage, setActivePage, session }) => {
             {navLinks.map((item) =>
               item.type === "link" ? (
                 <NavLink key={item.name} pageName={item.name} />
-              ) : session == null ? (
-                <Link
-                  to="/login"
-                  className={`px-3 py-2 rounded-md text-sm font-bold transition-colors duration-200 text-stone-600 dark:text-stone-300 hover:text-emerald-600`}
-                >
-                  Login
-                </Link>
               ) : (
-                <Dropdown key={item.name} item={item} />
+                session && <Dropdown key={item.name} item={item} />
               )
             )}
           </div>

@@ -10,6 +10,7 @@ const ImageInputForm = ({
   triggerFileSelect,
   handleSubmit,
   handleRemoveImage,
+  isSubmitting,
 }) => {
   return (
     <div className="w-full max-w-2xl mx-auto">
@@ -66,7 +67,7 @@ const ImageInputForm = ({
         <button
           type="submit"
           className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-          disabled={!imageFiles}
+          disabled={!imageFiles || isSubmitting}
         >
           <SendIcon />
         </button>
