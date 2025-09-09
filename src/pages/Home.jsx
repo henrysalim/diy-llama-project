@@ -120,7 +120,7 @@ const Home = ({ session }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "meta-llama/llama-3.2-90b-vision-instruct",
+            model: "meta-llama/llama-4-maverick",
             messages: [
               {
                 role: "user",

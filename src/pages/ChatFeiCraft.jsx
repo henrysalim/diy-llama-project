@@ -1,17 +1,3 @@
-// ChatFeiCrafts.jsx
-// Full integrated ChatFeiCrafts with:
-// - Gamification (badges + levels)
-// - DIY Budget & Time Estimator
-// - Memory of Materials (material intelligence)
-// - Checklist ONLY when user prompt explicitly asks for "langkah" or "bahan"
-// - AI Mood / response-style selector (affects system prompt)
-// - Professional/elegant Tailwind UI
-//
-// Notes:
-// - Keeps your provided API key unchanged (as requested).
-// - Assumes you have a DIYChatbotForm component that calls onSubmit(text).
-// - Stores state in localStorage for persistence across reloads.
-
 import { useEffect, useRef, useState } from "react";
 import DIYChatbotForm from "../components/DIYChatbotForm";
 
@@ -472,16 +458,6 @@ const ChatFeiCrafts = () => {
   };
 
   // -------------------------
-  // Clear chat & progress
-  // -------------------------
-  const handleClear = () => {
-    if (!confirm("Hapus semua chat dan progress?")) return;
-    setMessages([]);
-    setProgress({ done: 0, total: 0 });
-    persist(STORAGE_KEYS.MSGS, []);
-  };
-
-  // -------------------------
   // Load progress & badges on mount
   // -------------------------
   useEffect(() => {
@@ -528,7 +504,7 @@ const ChatFeiCrafts = () => {
   // Render component
   // -------------------------
   return (
-    <div className="flex flex-col h-screen bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-white">
+    <div className="flex flex-col h-auto bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-white">
       {/* Top navbar */}
       <header className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white p-4 shadow-md">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
@@ -600,18 +576,6 @@ const ChatFeiCrafts = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="text-xs opacity-80">Mood</div>
-            <select
-              value={mood}
-              onChange={(e) => setMood(e.target.value)}
-              className="px-3 py-2 rounded-lg border bg-white"
-            >
-              <option>Friendly</option>
-              <option>Enthusiastic</option>
-              <option>Minimal</option>
-              <option>Mentor</option>
-            </select>
-
             <button
               onClick={() => {
                 const weekly = `🎉 Tantangan Mingguan: Buat sesuatu dari kardus bekas!`;
@@ -795,83 +759,10 @@ const ChatFeiCrafts = () => {
               <h3 className="text-sm font-semibold">🏷 Quick Actions</h3>
               <div className="mt-2 flex flex-col gap-2">
                 <button
-                  onClick={handleSaveHistory}
-                  className="px-3 py-2 bg-purple-500 text-white rounded-md text-sm"
-                >
-                  💾 Simpan Riwayat Chat
-                </button>
-
-                <button
                   onClick={handleClearHistory}
                   className="px-3 py-2 bg-red-500 text-white rounded-md text-sm"
                 >
                   🗑 Hapus Semua Riwayat
-                </button>
-                <button
-                  onClick={() => {
-                    const lastBot = [...messages]
-                      .reverse()
-                      .find((m) => m.role === "bot" && m.content);
-                    if (!lastBot)
-                      return alert("Belum ada jawaban bot untuk diexport.");
-                    // export to workshop by storing minimal payload
-                    const payload = {
-                      title: lastBot.content.slice(0, 80),
-                      blocks: lastBot.blocks || [
-                        { type: "paragraph", content: lastBot.content },
-                      ],
-                      meta: {},
-                    };
-                    localStorage.setItem(
-                      "feicraft-workshop",
-                      JSON.stringify(payload)
-                    );
-                    alert(
-                      "Export ke Workshop siap! Buka halaman Workshop untuk melihatnya."
-                    );
-                  }}
-                  className="px-3 py-2 bg-sky-500 text-white rounded-md text-sm"
-                >
-                  📑 Export ke Workshop
-                </button>
-
-                <button
-                  onClick={() => {
-                    // save last bot to gallery (local storage)
-                    const lastBot = [...messages]
-                      .reverse()
-                      .find((m) => m.role === "bot" && m.content);
-                    if (!lastBot)
-                      return alert("Belum ada balasan bot untuk disimpan.");
-                    const gallery = JSON.parse(
-                      localStorage.getItem("feicraft-gallery") || "[]"
-                    );
-                    gallery.unshift({
-                      id: Date.now(),
-                      content: lastBot.content,
-                      blocks: lastBot.blocks || null,
-                      date: new Date().toISOString(),
-                    });
-                    localStorage.setItem(
-                      "feicraft-gallery",
-                      JSON.stringify(gallery)
-                    );
-                    // unlock badge for saving
-                    if (!badges.includes("Archivist")) {
-                      const newBadges = [...badges, "Archivist"];
-                      setBadges(newBadges);
-                      persist(STORAGE_KEYS.BADGES, newBadges);
-                      setLevel(recomputeLevel(newBadges));
-                      alert(
-                        "🏅 Badge unlocked: Archivist (Ide tersimpan ke gallery)"
-                      );
-                    } else {
-                      alert("Disimpan ke gallery!");
-                    }
-                  }}
-                  className="px-3 py-2 bg-sky-100 text-sky-800 rounded-md text-sm"
-                >
-                  🖼 Simpan ke Gallery
                 </button>
 
                 <button
