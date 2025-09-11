@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import ImageInputForm from "../components/ImageInputForm";
 import { supabase } from "../auth/supabase";
 import Login from "./Login";
-import { span } from "framer-motion/client";
+import LoadingSpinner from "../components/LoadingSpinner";
+import imagePrompt from "../prompt/imagePrompt";
+import ImageChatResponse from "../components/ImageChatResponse";
 
 const Home = ({ session }) => {
   const [imageFile, setImageFile] = useState("");
@@ -51,10 +53,10 @@ const Home = ({ session }) => {
     }
   };
 
-  const clearImage = () => {
+  const clearData = () => {
     if (imagePreview && imageFile) {
-      setImageFile(null);
-      setImagePreview(null);
+      setImageFile("");
+      setImagePreview("");
     }
   };
 
@@ -104,10 +106,9 @@ const Home = ({ session }) => {
     setApiResponse("");
 
     try {
-      const filePath = await uploadImage(imageFile);
+      await uploadImage(imageFile);
       const apiKey = `${import.meta.env.VITE_LLAMA_API_KEY}`;
-      const publicUrl = await getPublicUrl(filePath);
-      console.log(publicUrl);
+      const publicUrl = await getPublicUrl();
 
       const response = await fetch(
         "https://openrouter.ai/api/v1/chat/completions",
@@ -120,14 +121,14 @@ const Home = ({ session }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "meta-llama/llama-4-maverick",
+            model: "meta-llama/llama-3.2-90b-vision-instruct",
             messages: [
               {
                 role: "user",
                 content: [
                   {
                     type: "text",
-                    text: "Could you see the image?",
+                    text: imagePrompt,
                   },
                   {
                     type: "image_url",
@@ -142,20 +143,19 @@ const Home = ({ session }) => {
         }
       );
 
+      const data = await response.json();
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error.message || "API Request Failed");
+        throw new Error(data.error.message || "API Request Failed");
       }
 
-      const data = await response.json();
-      // const message = data.choices[0].message.content;
-      setApiResponse(data);
-      console.log(apiResponse);
+      const message = data.choices[0].message.content;
+      setApiResponse(message);
+      console.log(message);
     } catch (error) {
       console.error("Error calling OpenRouter API: ", error.message);
       setApiResponse(`Error: ${error.message}`);
     } finally {
-      clearImage();
+      clearData();
       setIsSubmitting(false);
     }
   };
@@ -174,7 +174,11 @@ const Home = ({ session }) => {
             : "Please login first to continue"}
         </p>
       </div>
-      {session != null ? (
+      {isSubmitting ? (
+        <LoadingSpinner />
+      ) : apiResponse && !isSubmitting ? (
+        <ImageChatResponse response={apiResponse} onClear={clearData} />
+      ) : session != null ? (
         <ImageInputForm
           imageFiles={imageFile}
           imagePreviews={imagePreview}
@@ -188,7 +192,6 @@ const Home = ({ session }) => {
       ) : (
         <Login />
       )}
-      {isSubmitting && <p>Loading...</p>}
     </div>
   );
 };
