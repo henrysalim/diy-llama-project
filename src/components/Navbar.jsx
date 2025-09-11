@@ -10,7 +10,7 @@ const Navbar = ({ activePage, setActivePage, session }) => {
   const navLinks = [
     { name: "Home", type: "link" },
     { name: "ChatFeiCraft", type: "link" },
-    { name: "About FeiCraft", type: "link" },
+    { name: "Community", type: "link" },
     { name: session?.full_name, type: "dropdown" },
   ];
   const navigate = useNavigate();

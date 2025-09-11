@@ -5,6 +5,7 @@ import WorkshopMode from "./pages/WorkshopMode";
 
 import { useEffect, useState } from "react";
 import { supabase } from "./auth/supabase";
+import DIYCommunity from "./pages/DIYCommunity";
 
 export default function App() {
   const [activePage, setActivePage] = useState("Home");
@@ -43,17 +44,19 @@ export default function App() {
         return <ChatFeiCraft />;
       case "WorkshopMode":
         return <WorkshopMode />;
+      case "Community":
+        return <DIYCommunity />;
       default:
         return (
           <div className="text-center">
-            <h1 className="text-4xl font-bold">Home</h1>
+            <h1 className="text-4xl font-bold">Not Found</h1>
           </div>
         );
     }
   };
 
   return (
-    <div className="h-screen bg-orange-50 dark:bg-stone-900 text-stone-800 dark:text-stone-200 font-sans flex flex-col transition-colors duration-300">
+    <div className="h-screen pb-24 bg-orange-50 dark:bg-stone-900 text-stone-800 dark:text-stone-200 font-sans flex flex-col transition-colors duration-300">
       <Navbar
         session={session}
         activePage={activePage}

@@ -548,7 +548,7 @@ const ChatFeiCrafts = () => {
           <div className="flex gap-3 items-center">
             <button
               onClick={handleRandomIdea}
-              className="px-3 py-2 bg-white shadow rounded-lg text-sm hover:shadow-md"
+              className="px-3 py-2 bg-white dark:text-gray-900 shadow rounded-lg text-sm hover:shadow-md"
             >
               🎲 Ide Acak
             </button>
@@ -563,13 +563,13 @@ const ChatFeiCrafts = () => {
                   handleSubmit(text);
                 }
               }}
-              className="px-3 py-2 bg-white shadow rounded-lg text-sm hover:shadow-md"
+              className="px-3 py-2 bg-white dark:text-gray-900 shadow rounded-lg text-sm hover:shadow-md"
             >
               🔍 Tambah Bahan
             </button>
             <button
               onClick={resetIdeas}
-              className="px-3 py-2 bg-white shadow rounded-lg text-sm hover:shadow-md"
+              className="px-3 py-2 bg-white dark:text-gray-900 shadow rounded-lg text-sm hover:shadow-md"
             >
               ♻ Reset Ide
             </button>

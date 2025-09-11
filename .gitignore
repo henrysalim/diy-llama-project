@@ -22,9 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-<<<<<<< HEAD
-/.env
+/.env.development.local
 .vercel
-=======
-/.env
->>>>>>> Upload chatbot code without next/prev
+.env
