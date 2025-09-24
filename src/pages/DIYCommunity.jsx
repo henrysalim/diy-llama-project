@@ -1,34 +1,24 @@
 import { useState, useRef, useEffect } from "react";
 import {
   Heart,
-  MessageCircle,
   Share2,
-  MapPin,
   Clock,
   DollarSign,
   Users,
   Trophy,
   Zap,
-  ShoppingCart,
-  Eye,
   Search,
   Plus,
-  Upload,
   X,
   Send,
-  Edit,
-  Trash2,
-  FileChartLine,
 } from "lucide-react";
 import Showcase from "../components/Communities/Showcase";
 import Marketplace from "../components/Communities/Marketplace";
-import { filterProps } from "framer-motion";
 import Challenges from "../components/Communities/Challenges";
 import Live from "../components/Communities/Live";
 import CreatePost from "../components/Communities/Modals/CreatePost";
 import CreateProduct from "../components/Communities/Modals/CreateProduct";
 import { supabase } from "../auth/supabase";
-import { image } from "framer-motion/client";
 import ProductModal from "../components/Communities/ProductModal";
 import CreateWorkshop from "../components/Communities/Modals/CreateWorkshop";
 
@@ -202,11 +192,42 @@ const DIYCommunity = () => {
         ...data,
         user_id: user.id,
         user_name: user.user_metadata?.full_name,
-        user_avatar: user.avatar,
-        created_at: `${new Date().toISOString()}`,
+        user_avatar: user.user_metadata?.avatar,
+        created_at: new Date().toISOString(),
       };
 
       if (type === "posts") {
+        const imageUrls = await Promise.all(
+          data.images.map(async (file) => {
+            const filePath = `${user.id}/${Date.now()}-${file.name}`;
+
+            // Upload file
+            const { error: uploadError } = await supabase.storage
+              .from("showcase_images")
+              .upload(filePath, file);
+
+            if (uploadError) {
+              console.error(error);
+              throw uploadError;
+            }
+
+            // Get signed URL
+            const { data, error } = await supabase.storage
+              .from("showcase_images") // must match the bucket name!
+              .createSignedUrl(filePath, 60 * 60); // 1 hour
+
+            if (error) {
+              console.error(error);
+              return null;
+            }
+            console.log(data);
+            return data.signedUrl;
+          })
+        );
+        payload.images
+          ? (payload.images = imageUrls.filter((url) => url !== null))
+          : (payload.images = []);
+
         payload.materials = Array.isArray(data.materials)
           ? data.materials
           : data.materials.split(",").map((m) => m.trim());
@@ -217,8 +238,8 @@ const DIYCommunity = () => {
           : data.materials_needed.split(",").map((m) => m.trim());
       }
 
-      const result = await supabase.from(type).insert(payload);
-      if (result.error) throw new Error(result.error.message);
+      const { error } = await supabase.from(type).insert(payload);
+      if (error) throw new Error(error.message);
 
       resetter();
       close();
@@ -586,7 +607,7 @@ const DIYCommunity = () => {
 
   if (loading && posts.length === 0) {
     return (
-      <div className="min-h-screen max-w-md bg-stone-50 flex items-center justify-center">
+      <div className="flex justify-center items-center w-md bg-stone-50 text-gray-900 p-10">
         <div className="text-xl">Loading creative works...</div>
       </div>
     );
@@ -770,6 +791,7 @@ const DIYCommunity = () => {
           resetForms={resetForms}
           difficultyLevels={difficultyLevels}
           loading={loading}
+          fileInputRef={fileInputRef}
           setShowCreatePost={setShowCreatePost}
           newPost={newPost}
           setNewPost={setNewPost}
