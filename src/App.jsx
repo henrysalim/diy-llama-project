@@ -56,7 +56,7 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen pb-24 bg-orange-50 dark:bg-stone-900 text-stone-800 dark:text-stone-200 font-sans flex flex-col transition-colors duration-300">
+    <div className="h-screen pb-24 bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-stone-200 font-sans flex flex-col transition-colors duration-300">
       <Navbar
         session={session}
         activePage={activePage}

@@ -504,10 +504,10 @@ const ChatFeiCrafts = () => {
   // Render component
   // -------------------------
   return (
-    <div className="flex flex-col h-auto bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-white">
+    <div className="flex flex-col h-auto bg-stone-50 items-center dark:bg-stone-900 text-stone-800 dark:text-white w-full">
       {/* Top navbar */}
-      <header className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white p-4 shadow-md">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
+      <header className="bg-gradient-to-r w-4xl from-emerald-500 to-emerald-600 text-white p-4 shadow-md">
+        <div className="w-full mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-extrabold">✨ FeiCraft</h1>
             <p className="text-sm opacity-90">
