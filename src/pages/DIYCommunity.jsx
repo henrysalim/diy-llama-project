@@ -614,7 +614,7 @@ const DIYCommunity = () => {
   }
 
   return (
-    <div className="h-full bg-stone-50 text-stone-800">
+    <div className="h-screen bg-stone-50 dark:bg-stone-900 text-stone-800 w-full mx-auto">
       <header className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white p-4 shadow-lg sticky top-0 z-40">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-4">
