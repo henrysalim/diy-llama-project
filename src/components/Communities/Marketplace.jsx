@@ -1,4 +1,4 @@
-import { Eye } from "lucide-react";
+import { Eye, Flag } from "lucide-react";
 
 const Marketplace = ({ filteredProducts, setSelectedProduct }) => {
   return (
@@ -37,6 +37,9 @@ const Marketplace = ({ filteredProducts, setSelectedProduct }) => {
               className="w-full bg-emerald-500 text-white py-2 px-3 rounded-lg text-xs hover:bg-emerald-600 flex items-center justify-center gap-1"
             >
               <Eye size={12} /> Lihat Detail
+            </button>
+            <button className="flex mt-3 text-sm float-right pb-4 items-center gap-1 text-stone-500 hover:text-red-500">
+              <Flag size={12} />{" "}Report
             </button>
           </div>
         </div>

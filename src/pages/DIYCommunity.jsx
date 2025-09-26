@@ -11,6 +11,7 @@ import {
   Plus,
   X,
   Send,
+  Flag,
 } from "lucide-react";
 import Showcase from "../components/Communities/Showcase";
 import Marketplace from "../components/Communities/Marketplace";
@@ -1029,6 +1030,9 @@ const DIYCommunity = () => {
                   </button>
                   <button className="flex items-center gap-2 px-4 py-2 bg-stone-100 text-stone-600 rounded-lg hover:bg-stone-200">
                     <Share2 size={16} /> Share
+                  </button>
+                  <button className="flex items-center gap-2 px-4 py-2 bg-stone-100 text-stone-600 rounded-lg hover:bg-stone-200">
+                    <Flag size={16} /> Report
                   </button>
                 </div>
 

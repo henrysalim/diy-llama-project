@@ -1,4 +1,4 @@
-import { Clock, Edit, Eye, Trash2 } from "lucide-react";
+import { Clock, Edit, Eye, Flag, Trash2 } from "lucide-react";
 
 const Live = ({
   filteredWorkshops,
@@ -87,6 +87,10 @@ const Live = ({
             className="px-3 py-2 bg-stone-100 hover:bg-stone-200 rounded text-sm"
           >
             <Eye size={16} />
+          </button>
+
+          <button className="flex float-right items-center gap-1 text-stone-500 hover:text-red-500">
+            <Flag size={12} />
           </button>
         </div>
       </div>

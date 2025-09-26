@@ -1,4 +1,4 @@
-import { Heart, MessageCircle } from "lucide-react";
+import { Flag, Heart, MessageCircle } from "lucide-react";
 
 const Showcase = ({
   filteredPosts,
@@ -100,6 +100,9 @@ const Showcase = ({
                     (c) => c.post_id === post.id && c.type === "post"
                   ).length
                 }
+              </button>
+              <button className="flex items-center gap-1 text-stone-500 hover:text-red-500">
+                <Flag size={12} />
               </button>
             </div>
             <button
